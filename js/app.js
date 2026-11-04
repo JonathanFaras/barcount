@@ -80,6 +80,7 @@ function start() {
   applyZone();
   updateNavBadge();
   showScreen(store.state.ui.screen);
+  if (store.catalogUpdated) toast('🆕 Liste de produits mise à jour (compteurs conservés)');
   registerServiceWorker();
 }
 

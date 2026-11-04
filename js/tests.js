@@ -4,6 +4,7 @@ import {
   createStore, memoryStorage, parseBackup, buildShareText, restockGroups, packSummary,
   totals, STORAGE_KEY, SCHEMA_VERSION,
 } from './store.js';
+import { CATALOG_VERSION, DEFAULT_PRODUCTS } from './products.js';
 
 const groups = [];
 let current = null;
@@ -230,6 +231,63 @@ group("Rejet d'un fichier d'import invalide", () => {
     const before = JSON.stringify(s.state);
     throwsWith(() => s.importBackup('{"schemaVersion":1}'));
     eq(JSON.stringify(s.state), before);
+  });
+});
+
+group('Mise à jour automatique de la liste', () => {
+  // Téléphone resté sur l'ancienne liste (schéma 1, liste n°1), avec des compteurs en cours.
+  function oldPhone() {
+    const storage = memoryStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify({
+      schemaVersion: 1,
+      products: [
+        { id: 'pujol', name: 'Pujol', section: 'frigo', packSize: 6, counts: { front: 2, back: 1 } },
+        { id: 'fourroses', name: 'Four roses bourbon', section: 'comptoir', packSize: 6, counts: { front: 1, back: 0 } },
+        { id: 'sirop-vanille', name: 'Sirop vanille', section: 'jus-sirops', packSize: 6, counts: { front: 0, back: 3 } },
+        { id: 'pepsi', name: 'Pepsi', section: 'frigo', packSize: 6, counts: { front: 0, back: 4 } },
+      ],
+      ui: { zone: 'back' },
+    }));
+    return storage;
+  }
+  const find = (s, id) => s.state.products.find((p) => p.id === id);
+
+  test('la nouvelle liste est appliquée (noms, packs)', () => {
+    const s = createStore({ storage: oldPhone() });
+    eq(s.catalogUpdated, true);
+    eq([find(s, 'pujol').name, find(s, 'pepsi').packSize], ['feynard', 24]);
+    eq(s.state.catalogVersion, CATALOG_VERSION);
+  });
+  test('les compteurs en cours sont conservés', () => {
+    const s = createStore({ storage: oldPhone() });
+    eq([find(s, 'pujol').counts, find(s, 'pepsi').counts], [{ front: 2, back: 1 }, { front: 0, back: 4 }]);
+  });
+  test('les produits retirés disparaissent', () => {
+    const s = createStore({ storage: oldPhone() });
+    eq(find(s, 'fourroses'), undefined);
+  });
+  test('un produit ajouté à la main est gardé, en fin de section', () => {
+    const s = createStore({ storage: oldPhone() });
+    const jus = s.state.products.filter((p) => p.section === 'jus-sirops');
+    eq([jus.at(-1).id, jus.at(-1).counts], ['sirop-vanille', { front: 0, back: 3 }]);
+    eq(s.state.products.length, DEFAULT_PRODUCTS.length + 1);
+  });
+  test('la mise à jour est enregistrée et ne se refait pas', () => {
+    const storage = oldPhone();
+    createStore({ storage });
+    eq(JSON.parse(storage.getItem(STORAGE_KEY)).catalogVersion, CATALOG_VERSION);
+    eq(createStore({ storage }).catalogUpdated, false);
+  });
+  test('un téléphone déjà à jour garde ses propres réglages', () => {
+    const storage = memoryStorage();
+    createStore({ storage }).updateProduct('absolut', { name: 'Absolut Vodka', packSize: 12 });
+    const s = createStore({ storage });
+    eq([s.catalogUpdated, find(s, 'absolut').name, find(s, 'absolut').packSize], [false, 'Absolut Vodka', 12]);
+  });
+  test("l'import d'une ancienne sauvegarde reçoit aussi la nouvelle liste", () => {
+    const s = freshStore();
+    s.importBackup(oldPhone().getItem(STORAGE_KEY));
+    eq([find(s, 'pujol').name, find(s, 'pujol').counts, find(s, 'fourroses')], ['feynard', { front: 2, back: 1 }, undefined]);
   });
 });
 

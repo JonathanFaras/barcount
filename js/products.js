@@ -16,6 +16,24 @@ export const SECTION_IDS = SECTIONS.map((s) => s.id);
 
 export const DEFAULT_PACK_SIZE = 6;
 
+/**
+ * Version de la liste par défaut. À AUGMENTER à chaque modification de DEFAULT_PRODUCTS :
+ * les téléphones qui ont une version plus ancienne reçoivent alors la nouvelle liste
+ * automatiquement, en gardant leurs compteurs (voir applyCatalog() dans store.js).
+ *   1 : liste reprise de l'ancienne appli (v2.0.0)
+ *   2 : liste réglée par JoJo le 04/11/2026 (v2.1.0)
+ */
+export const CATALOG_VERSION = 2;
+
+/**
+ * Identifiants retirés de la liste par défaut : supprimés lors de la mise à jour automatique.
+ * Les autres produits inconnus de la liste sont ceux ajoutés à la main sur le téléphone : ils sont gardés.
+ */
+export const RETIRED_IDS = [
+  'fourroses', 'jamesoncomptoire', 'bacardiblanca', 'eljimadorcomptoire',
+  'parati', 'lesgalets', 'bacardioro',
+];
+
 /** Points en attente d'informations (affichés dans les Réglages). Ne pas inventer de produits. */
 export const TODOS = [
   'TODO : sirops (Jus & Sirops) : parfums inconnus, à ajouter depuis les Réglages.',

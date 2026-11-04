@@ -5,13 +5,15 @@
 //   counts.front / counts.back = bouteilles MANQUANTES dans chaque zone.
 // Front stage et Backstage partagent la même liste de produits, chacun avec ses propres compteurs.
 //
-// localStorage['barcount-v2'] = { schemaVersion: 1, products: [...], ui: {...} }
+// localStorage['barcount-v2'] = { schemaVersion: 2, catalogVersion, products: [...], ui: {...} }
 
-import { DEFAULT_PRODUCTS, SECTIONS, SECTION_IDS, DEFAULT_PACK_SIZE } from './products.js';
+import {
+  DEFAULT_PRODUCTS, SECTIONS, SECTION_IDS, DEFAULT_PACK_SIZE, CATALOG_VERSION, RETIRED_IDS,
+} from './products.js';
 import { slugify, splitPacks, formatPacksShort, formatDateTime, formatIsoDate } from './format.js';
 
 export const STORAGE_KEY = 'barcount-v2';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const ZONES = ['front', 'back'];
 export const VIEWS = ['general', 'front', 'back'];
 export const VIEW_LABELS = { general: 'Général', front: 'Front stage', back: 'Backstage' };
@@ -46,7 +48,37 @@ export function defaultProducts() {
 }
 
 export function defaultState() {
-  return { schemaVersion: SCHEMA_VERSION, products: defaultProducts(), ui: { ...DEFAULT_UI } };
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    catalogVersion: CATALOG_VERSION,
+    products: defaultProducts(),
+    ui: { ...DEFAULT_UI },
+  };
+}
+
+/**
+ * Mise à jour automatique de la liste par défaut (quand CATALOG_VERSION augmente).
+ * - les produits de la nouvelle liste remplacent les anciens (nom, section, pack, ordre),
+ *   en GARDANT les compteurs Front / Back des produits déjà présents ;
+ * - les produits retirés (RETIRED_IDS) disparaissent ;
+ * - les produits ajoutés à la main sur le téléphone sont gardés, à la fin de leur section.
+ * Renvoie { state, updated }.
+ */
+export function applyCatalog(state) {
+  if (state.catalogVersion >= CATALOG_VERSION) return { state, updated: false };
+  const previous = new Map(state.products.map((p) => [p.id, p]));
+  const catalogIds = new Set(DEFAULT_PRODUCTS.map((p) => p.id));
+  const products = defaultProducts().map((p) => {
+    const old = previous.get(p.id);
+    return old ? { ...p, counts: { ...old.counts } } : p;
+  });
+  products.push(...state.products.filter((p) => !catalogIds.has(p.id) && !RETIRED_IDS.includes(p.id)));
+  // Tableau rangé section par section ; les produits ajoutés à la main arrivent en fin de section.
+  const ordered = SECTIONS.flatMap((s) => products.filter((p) => p.section === s.id));
+  return {
+    state: { ...state, catalogVersion: CATALOG_VERSION, products: ordered },
+    updated: true,
+  };
 }
 
 /**
@@ -61,8 +93,9 @@ export function migrate(raw) {
   if (version > SCHEMA_VERSION) {
     fail(`Ces données viennent d'une version plus récente de BarCount (schéma ${version}). Mets l'appli à jour.`);
   }
-  const data = { ...raw };
-  // (aucune migration pour l'instant : le schéma 1 est le premier)
+  let data = { ...raw };
+  // 1 → 2 : ajout de catalogVersion (les données v1 ont été créées avec la liste n°1).
+  if (data.schemaVersion === 1) data = { ...data, schemaVersion: 2, catalogVersion: 1 };
   return data;
 }
 
@@ -106,7 +139,13 @@ export function validateState(raw) {
     if (seen.has(p.id)) fail(`Identifiant en double : « ${p.id} ».`);
     seen.add(p.id);
   }
-  return { schemaVersion: SCHEMA_VERSION, products, ui: normalizeUi(data.ui) };
+  if (!Number.isInteger(data.catalogVersion) || data.catalogVersion < 1) fail('Version de liste invalide.');
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    catalogVersion: data.catalogVersion,
+    products,
+    ui: normalizeUi(data.ui),
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -225,14 +264,18 @@ function browserStorage() {
 
 export function createStore({ storage = browserStorage(), onSaveError = null } = {}) {
   const listeners = new Set();
+  let catalogUpdated = false;
   let state = load();
+  if (catalogUpdated) save();
 
   function load() {
     let text = null;
     try { text = storage.getItem(STORAGE_KEY); } catch { /* stockage indisponible */ }
     if (!text) return defaultState();
     try {
-      return validateState(JSON.parse(text));
+      const result = applyCatalog(validateState(JSON.parse(text)));
+      catalogUpdated = result.updated;
+      return result.state;
     } catch (error) {
       console.warn('Données BarCount illisibles, liste par défaut utilisée :', error);
       // On garde une copie des données abîmées au lieu de les écraser sans trace.
@@ -295,6 +338,9 @@ export function createStore({ storage = browserStorage(), onSaveError = null } =
 
   return {
     get state() { return state; },
+
+    /** true si la liste de produits vient d'être mise à jour automatiquement au démarrage. */
+    get catalogUpdated() { return catalogUpdated; },
 
     subscribe(fn) {
       listeners.add(fn);
@@ -388,6 +434,7 @@ export function createStore({ storage = browserStorage(), onSaveError = null } =
     /** Remet la liste de produits par défaut (compteurs à 0). Les préférences d'affichage sont gardées. */
     resetProducts() {
       state.products = defaultProducts();
+      state.catalogVersion = CATALOG_VERSION;
       commit({ type: 'products' });
     },
 
@@ -397,7 +444,8 @@ export function createStore({ storage = browserStorage(), onSaveError = null } =
 
     /** Remplace tout l'état par celui d'une sauvegarde (texte JSON). Lève une Error si invalide. */
     importBackup(text) {
-      state = parseBackup(text);
+      // Une ancienne sauvegarde reçoit aussi la liste à jour (compteurs conservés).
+      state = applyCatalog(parseBackup(text)).state;
       commit({ type: 'all' });
     },
   };
