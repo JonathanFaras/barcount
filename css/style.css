@@ -13,6 +13,8 @@
   --back-ink: #2e1a00;
   --zone: var(--front);
   --zone-ink: var(--front-ink);
+  --accent: #7aa2ff;     /* actions principales hors inventaire */
+  --accent-ink: #0b1640;
   --danger: #ff5c6c;
   --ok: #3ddc84;
   --radius: 14px;
@@ -92,7 +94,7 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action
 }
 .btn:active { transform: scale(.97); }
 .btn:disabled { opacity: .35; }
-.btn--primary { background: var(--zone); border-color: var(--zone); color: var(--zone-ink); }
+.btn--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn--ok { background: var(--ok); border-color: var(--ok); color: #062814; }
 .btn--danger { background: transparent; border-color: var(--danger); color: var(--danger); }
 .btn--block { width: 100%; }
