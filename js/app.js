@@ -1,4 +1,5 @@
 // Démarrage de BarCount et navigation entre les écrans.
+import { createStore, totals } from './store.js';
 import * as inventaire from './ui/inventaire.js';
 import * as remonter from './ui/remonter.js';
 import * as reglages from './ui/reglages.js';
@@ -9,7 +10,6 @@ const SCREENS = {
   reglages: { title: 'Réglages', module: reglages },
 };
 
-let currentScreen = 'inventaire';
 let toastTimer = null;
 
 function toast(message) {
@@ -20,9 +20,24 @@ function toast(message) {
   toastTimer = setTimeout(() => { el.hidden = true; }, 2500);
 }
 
+const store = createStore({
+  onSaveError: () => toast('⚠️ Sauvegarde impossible sur ce téléphone (stockage plein ou bloqué).'),
+});
+
+function updateNavBadge() {
+  const badge = document.getElementById('nav-badge');
+  const total = totals(store.state.products).general;
+  badge.textContent = String(total);
+  badge.hidden = total === 0;
+}
+
+function applyZone() {
+  document.body.dataset.zone = store.state.ui.zone;
+}
+
 function showScreen(name) {
   if (!SCREENS[name]) name = 'inventaire';
-  currentScreen = name;
+  if (store.state.ui.screen !== name) store.setUi({ screen: name });
   document.body.dataset.screen = name;
   for (const section of document.querySelectorAll('.screen')) {
     section.hidden = section.dataset.screen !== name;
@@ -45,15 +60,26 @@ function registerServiceWorker() {
 }
 
 function start() {
-  const ctx = { toast, showScreen };
+  const ctx = { store, toast, showScreen };
   for (const [name, { module }] of Object.entries(SCREENS)) {
     module.mount(document.getElementById(`screen-${name}`), ctx);
   }
+
+  store.subscribe((state, change) => {
+    applyZone();
+    updateNavBadge();
+    // Après un import (état entièrement remplacé), on réaffiche l'écran courant.
+    if (change.type === 'all') showScreen(state.ui.screen);
+  });
+
   document.querySelector('.tabbar').addEventListener('click', (event) => {
     const btn = event.target.closest('[data-nav]');
     if (btn) showScreen(btn.dataset.nav);
   });
-  showScreen(currentScreen);
+
+  applyZone();
+  updateNavBadge();
+  showScreen(store.state.ui.screen);
   registerServiceWorker();
 }
 

@@ -15,6 +15,8 @@ const PRECACHE = [
   './js/version.js',
   './js/app.js',
   './js/format.js',
+  './js/products.js',
+  './js/store.js',
   './js/ui/inventaire.js',
   './js/ui/remonter.js',
   './js/ui/reglages.js',
