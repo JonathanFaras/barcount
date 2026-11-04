@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'self'">
+  <title>BarCount — tests</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar__title">BarCount — tests</h1>
+    <p class="topbar__screen" id="test-summary">En cours…</p>
+  </header>
+  <main class="content">
+    <p class="muted">
+      Tests sans dépendance. Ils utilisent un stockage en mémoire : tes vraies données ne sont pas touchées.
+      À ouvrir via un serveur (GitHub Pages ou serveur local) : les modules ES ne se chargent pas en <code>file://</code>.
+    </p>
+    <div id="test-results"></div>
+  </main>
+  <script type="module" src="./js/tests.js"></script>
+</body>
+</html>
