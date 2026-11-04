@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Icône source de BarCount. Les PNG sont générés à partir de ce fichier (voir tools/generate-icons.mjs). -->
+  <rect width="512" height="512" fill="#14142a"/>
+  <g id="glyphe" transform="translate(256 256) scale(0.72) translate(-256 -256)">
+    <!-- Bouteille -->
+    <rect x="218" y="52" width="76" height="40" rx="10" fill="#e8e8f4"/>
+    <rect x="230" y="88" width="52" height="86" fill="#00c2a8"/>
+    <path d="M230 170 C230 206 162 206 162 262 L162 420 Q162 456 198 456 L314 456 Q350 456 350 420 L350 262 C350 206 282 206 282 170 Z" fill="#00c2a8"/>
+    <rect x="162" y="296" width="188" height="84" fill="#14142a" opacity="0.35"/>
+    <!-- Pastille « + » -->
+    <circle cx="362" cy="380" r="78" fill="#ff9f1c" stroke="#14142a" stroke-width="14"/>
+    <rect x="320" y="368" width="84" height="24" rx="6" fill="#14142a"/>
+    <rect x="350" y="338" width="24" height="84" rx="6" fill="#14142a"/>
+  </g>
+</svg>

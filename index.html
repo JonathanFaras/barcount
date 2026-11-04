@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
+  <title>BarCount</title>
+  <meta name="description" content="Noter les bouteilles manquantes au bar et générer la liste « À remonter ».">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#14142a">
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BarCount">
+
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/version.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar__title">BarCount</h1>
+    <p class="topbar__screen" id="screen-title">Inventaire</p>
+  </header>
+
+  <main class="content">
+    <section class="screen" id="screen-inventaire" data-screen="inventaire" aria-label="Inventaire"></section>
+    <section class="screen" id="screen-remonter" data-screen="remonter" aria-label="À remonter" hidden></section>
+    <section class="screen" id="screen-reglages" data-screen="reglages" aria-label="Réglages" hidden></section>
+    <noscript><p class="empty">BarCount a besoin de JavaScript pour fonctionner.</p></noscript>
+  </main>
+
+  <nav class="tabbar" aria-label="Navigation principale">
+    <button type="button" class="tabbar__btn" data-nav="inventaire" aria-current="page">
+      <span class="tabbar__icon" aria-hidden="true">📝</span>Inventaire
+    </button>
+    <button type="button" class="tabbar__btn" data-nav="remonter">
+      <span class="tabbar__icon" aria-hidden="true">📋</span>À remonter
+      <span class="badge" id="nav-badge" hidden></span>
+    </button>
+    <button type="button" class="tabbar__btn" data-nav="reglages">
+      <span class="tabbar__icon" aria-hidden="true">⚙️</span>Réglages
+    </button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <dialog class="dialog" id="copy-dialog" aria-labelledby="copy-dialog-title">
+    <h2 id="copy-dialog-title">Copie manuelle</h2>
+    <p>La copie automatique n'a pas marché. Sélectionne le texte puis copie-le.</p>
+    <textarea id="copy-dialog-text" rows="12" readonly></textarea>
+    <form method="dialog"><button class="btn btn--primary btn--block">Fermer</button></form>
+  </dialog>
+</body>
+</html>
