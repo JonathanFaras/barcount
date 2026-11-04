@@ -235,3 +235,10 @@ body[data-screen="inventaire"] { box-shadow: inset 6px 0 0 var(--zone); }
   * { transition: none !important; animation: none !important; }
   .btn:active, .step:active { transform: none; }
 }
+
+/* Sections repliables de la gestion des produits */
+details > summary.section-title { min-height: 44px; margin: 6px 0; cursor: pointer; list-style: none; }
+details > summary.section-title::-webkit-details-marker { display: none; }
+details > summary.section-title::after { content: '▸'; margin-left: auto; font-size: 1.2rem; }
+details[open] > summary.section-title::after { content: '▾'; }
+details[open] > .list { margin-bottom: 12px; }
