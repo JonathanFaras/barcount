@@ -1,13 +1,9 @@
 // Sections et liste de produits par défaut.
-// Reprise de l'ancien app.js (meyodb/barcount.github.io), avec ces corrections :
-//   - section « comptoire » renommée « comptoir » ;
-//   - les 4 jus passent de « caisse » à la nouvelle section « jus-sirops » ;
-//   - typos : « Schwepps agrume » → « Schweppes agrume », « Trois rivière » → « Trois Rivières ».
-// Les identifiants d'origine sont conservés.
 //
-// Doublons connus (gardés volontairement, dans deux sections différentes) :
-//   - « Jameson » : jamesoncomptoire (comptoir) et jameson (caisse) ;
-//   - « El jimador » : eljimadorcomptoire (comptoir) et eljimadortequila (caisse).
+// Liste du bar telle que réglée par JoJo dans l'appli (Réglages), le 04/11/2026 :
+// noms, sections, ordre réel du bar et tailles de pack.
+// Les identifiants d'origine sont conservés même quand le produit a été renommé
+// (ex. « pujol » s'appelle maintenant « feynard ») : ils ne sont jamais affichés.
 
 export const SECTIONS = [
   { id: 'frigo', label: 'Frigo', emoji: '🧊' },
@@ -22,54 +18,52 @@ export const DEFAULT_PACK_SIZE = 6;
 
 /** Points en attente d'informations (affichés dans les Réglages). Ne pas inventer de produits. */
 export const TODOS = [
-  "TODO : « Jack Daniel's Blackberry » ajouté dans Comptoir : section à confirmer.",
-  'TODO : autres produits à ajouter : liste non fournie.',
-  'TODO : produits à retirer : liste non fournie.',
   'TODO : sirops (Jus & Sirops) : parfums inconnus, à ajouter depuis les Réglages.',
 ];
 
-const p = (id, name, section) => ({ id, name, section, packSize: DEFAULT_PACK_SIZE });
+const p = (id, name, section, packSize = DEFAULT_PACK_SIZE) => ({ id, name, section, packSize });
 
 export const DEFAULT_PRODUCTS = [
   // 🧊 FRIGO
-  p('pepsi', 'Pepsi', 'frigo'),
-  p('pepsimax', 'Pepsi max', 'frigo'),
-  p('sevenup', '7up', 'frigo'),
-  p('perrier', 'Perrier', 'frigo'),
-  p('orangina', 'Orangina', 'frigo'),
-  p('lipton', 'Lipton', 'frigo'),
-  p('schweppesagrume', 'Schweppes agrume', 'frigo'),
-  p('schweppestonic', 'Schweppes tonic', 'frigo'),
-  p('eau', 'Eau', 'frigo'),
-  p('redbull', 'Redbull', 'frigo'),
-  p('desperados', 'Desperados', 'frigo'),
-  p('corona', 'Corona', 'frigo'),
+  p('pepsi', 'Pepsi', 'frigo', 24),
+  p('pepsimax', 'Pepsi max', 'frigo', 24),
+  p('sevenup', '7up', 'frigo', 24),
+  p('perrier', 'Perrier', 'frigo', 24),
+  p('orangina', 'Orangina', 'frigo', 24),
+  p('lipton', 'Lipton', 'frigo', 24),
+  p('schweppesagrume', 'Schweppes agrume', 'frigo', 24),
+  p('schweppestonic', 'Schweppes tonic', 'frigo', 24),
+  p('eau', 'Eau', 'frigo', 24),
+  p('redbull', 'Redbull', 'frigo', 1),
+  p('desperados', 'Desperados', 'frigo', 24),
+  p('corona', 'Corona', 'frigo', 1),
   p('corona0', 'Corona 0', 'frigo'),
   p('sambuca', 'Sambuca', 'frigo'),
-  p('demoisellesansgene', 'Demoiselle sans gêne', 'frigo'),
+  p('demoisellesansgene', 'Demoiselle sans gêne', 'frigo', 12),
   p('chardonnay', 'Chardonnay', 'frigo'),
-  p('pujol', 'Pujol', 'frigo'),
+  p('pujol', 'feynard', 'frigo'),
   p('martiniprosecco', 'Martini prosecco', 'frigo'),
-  p('kombuchaananas', 'Kombucha ananas', 'frigo'),
-  p('kombuchaframboise', 'Kombucha framboise', 'frigo'),
-  p('kombuchagingembre', 'Kombucha gingembre', 'frigo'),
   p('jager', 'Jager', 'frigo'),
-  p('bud', 'Bud', 'frigo'),
-  p('fevertreemediterranean', 'Fever tree mediterranean', 'frigo'),
-  p('fevertreepremium', 'Fever tree premium', 'frigo'),
-  p('fevertreegrapefruit', 'Fever tree grapefruit', 'frigo'),
   p('shotcaramel', 'Shot caramel', 'frigo'),
+  p('shot-caramel-fraise', 'shot caramel fraise', 'frigo'),
+  p('bud', 'Bud', 'frigo', 24),
   p('lilletrose', 'Lillet rose', 'frigo'),
+  p('kombuchagingembre', 'Kombucha gingembre', 'frigo', 24),
+  p('kombuchaframboise', 'Kombucha framboise', 'frigo', 24),
+  p('kombuchaananas', 'Kombucha ananas', 'frigo', 24),
+  p('fevertreemediterranean', 'Fever tree mediterranean', 'frigo', 24),
+  p('fevertreepremium', 'Fever tree premium', 'frigo', 24),
+  p('fevertreegrapefruit', 'Fever tree grapefruit', 'frigo', 24),
 
   // 🍸 COMPTOIR
   p('pinotnoir', 'Pinot noir', 'comptoir'),
-  p('gamaytouraine', 'Gamay Touraine', 'comptoir'),
+  p('gamaytouraine', 'Grand air', 'comptoir'),
   p('cointreau', 'Cointreau', 'comptoir'),
   p('kahlua', 'Kahlua', 'comptoir'),
   p('baileys', 'Baileys', 'comptoir'),
   p('ricardpastis', 'Ricard pastis de Marseille', 'comptoir'),
   p('suze', 'Suze', 'comptoir'),
-  p('giffard1885', 'Giffard 1885', 'comptoir'),
+  p('giffard1885', 'Amaretto', 'comptoir'),
   p('get27', 'Get27', 'comptoir'),
   p('stgermain', 'St germain elderflower liqueur', 'comptoir'),
   p('aperol', 'Aperol', 'comptoir'),
@@ -80,23 +74,16 @@ export const DEFAULT_PRODUCTS = [
   p('martinirosso', 'Martini rosso', 'comptoir'),
   p('jackdanielsrouge', 'Jack daniels rouge', 'comptoir'),
   p('jackdanielshoney', 'Jack daniels honey', 'comptoir'),
-  p('jackdanielsvert', 'Jack daniels vert', 'comptoir'),
-  // TODO : section « comptoir » à confirmer (ajout demandé par JoJo).
   p('jackdanielsblackberry', "Jack Daniel's Blackberry", 'comptoir'),
+  p('jackdanielsvert', 'Jack daniels vert', 'comptoir'),
   p('sailorjerry', 'Sailor Jerry', 'comptoir'),
   p('troisriviere', 'Trois Rivières', 'comptoir'),
   p('bacardispiced', 'Bacardi spiced', 'comptoir'),
-  p('fourroses', 'Four roses bourbon', 'comptoir'),
-  p('jamesoncomptoire', 'Jameson', 'comptoir'), // doublon volontaire avec « jameson » (caisse)
-  p('bacardiblanca', 'Bacardi blanca', 'comptoir'),
   p('bacardiouro', 'Bacardi carta oro', 'comptoir'),
   p('greygoose', 'Grey goose', 'comptoir'),
   p('thoquino', 'Thoquino', 'comptoir'),
   p('malibu', 'Malibu', 'comptoir'),
-  p('eljimadorcomptoire', 'El jimador', 'comptoir'), // doublon volontaire avec « eljimadortequila » (caisse)
   p('camparimilan', 'Campari milano', 'comptoir'),
-  p('parati', 'Parati', 'comptoir'),
-  p('lesgalets', 'Les galets', 'comptoir'),
 
   // 📦 CAISSE
   p('absolut', 'Absolut', 'caisse'),
@@ -105,7 +92,6 @@ export const DEFAULT_PRODUCTS = [
   p('eljimadortequila', 'El jimador tequila', 'caisse'),
   p('bacardicartablanca', 'Bacardi carta blanca', 'caisse'),
   p('jackdaniel', 'Jack Daniel', 'caisse'),
-  p('bacardioro', 'Bacardi oro', 'caisse'),
   p('triplesec', 'Triple sec', 'caisse'),
   p('cremepeche', 'Crème de pêche', 'caisse'),
 

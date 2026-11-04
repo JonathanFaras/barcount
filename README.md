@@ -55,9 +55,6 @@ docs/                  captures d'écran
 
 ## À compléter
 
-- [ ] Confirmer la section de « Jack Daniel's Blackberry » (actuellement **Comptoir**).
-- [ ] Autres produits à ajouter : liste non fournie.
-- [ ] Produits à retirer : liste non fournie.
 - [ ] Sirops : parfums à ajouter depuis les Réglages.
 - [ ] Ajouter des captures d'écran dans `docs/`.
 
